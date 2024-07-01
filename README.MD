@@ -1,5 +1,11 @@
 # Tools Suite to Dump Blazor Applications
 
+
+<p align="center">
+  <img src="/img/blazorrazor.png">
+</p>
+
+
 ## BlazorRazor.py - Blazor Application Dumper
 
 This tool is designed to identify and dump Blazor applications by accessing the `/_framework/blazor.boot.json` endpoint on a given URL. It can determine the deployment method (WASM or DLL), fetch appsettings references, and optionally download all related assemblies based on user input.
