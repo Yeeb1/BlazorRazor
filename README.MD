@@ -122,7 +122,7 @@ python3 BlazorSecrets.py /path/to/directory
 
 #### Running the Tool
 
-1. Ensure the `stats` directory contains JSON files dumped by BlazorBootDump.py.
+1. Ensure the `stats` directory contains JSON files dumped by `BlazorBootDump.py`.
 2. Run the script to analyze the assemblies:
 
 ```sh
