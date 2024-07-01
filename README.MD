@@ -112,7 +112,7 @@ python3 BlazorSecrets.py /path/to/directory
 
 ## BlazorAnalyse.py - Blazor Assembly Statistics Analyzer
 
-BlazorAnalyse.py processes directories dumped by BlazorBootDump.py to analyze and generate statistics on commonly found assemblies.
+`BlazorAnalyse.py` processes directories dumped by `BlazorBootDump.py` to analyze and generate statistics on commonly found assemblies.
 
 ### Features
 
