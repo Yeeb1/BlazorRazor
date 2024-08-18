@@ -13,23 +13,23 @@ def read_common_assemblies(file_path):
             return set(line.strip() for line in file)
     return set()
 
-def check_endpoint(url):
+def check_endpoint(url, headers):
     parsed_url = urlparse(url)
     host = parsed_url.netloc
     output_dir = os.path.join(os.getcwd(), host)
     
     endpoint = f"{url.rstrip('/')}/_framework/blazor.boot.json"
     try:
-        response = requests.get(endpoint, verify=False)
+        response = requests.get(endpoint, headers=headers, verify=False)
         if response.status_code == 200:
             print(f"[+] The file has been identified at: {endpoint} and will be parsed.")
-            parse_json(response.text, url, output_dir)
+            parse_json(response.text, url, output_dir, headers)
         else:
             print(f"[+] The file does not exist at: {endpoint}")
     except requests.exceptions.RequestException as e:
         print(f"[+] An error occurred: {e}")
 
-def parse_json(json_content, base_url, output_dir):
+def parse_json(json_content, base_url, output_dir, headers):
     try:
         data = json.loads(json_content)
         if "resources" in data:
@@ -45,10 +45,10 @@ def parse_json(json_content, base_url, output_dir):
         
         if "config" in data:
             appsettings = data["config"]
-            fetch_appsettings(appsettings, base_url, output_dir)
+            fetch_appsettings(appsettings, base_url, output_dir, headers)
         elif "appsettings" in data:
             appsettings = data["appsettings"]
-            fetch_appsettings(appsettings, base_url, output_dir)
+            fetch_appsettings(appsettings, base_url, output_dir, headers)
         else:
             print("[+] No appsettings references found.")
         
@@ -59,16 +59,16 @@ def parse_json(json_content, base_url, output_dir):
         
         dump_all = input("[+] Do you want to dump all assemblies (common and uncommon)? (Y/n): ").strip().lower() not in ['n', 'no']
         
-        fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_all, common_wasm_assemblies, common_dll_assemblies)
+        fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_all, common_wasm_assemblies, common_dll_assemblies, headers)
     except json.JSONDecodeError as e:
         print(f"[+] Error parsing JSON: {e}")
 
-def fetch_appsettings(appsettings, base_url, output_dir):
+def fetch_appsettings(appsettings, base_url, output_dir, headers):
     os.makedirs(output_dir, exist_ok=True)
     for config_file in appsettings:
         config_url = f"{base_url.rstrip('/')}/{config_file.lstrip('../')}"
         try:
-            response = requests.get(config_url, verify=False)
+            response = requests.get(config_url, headers=headers, verify=False)
             if response.status_code == 200:
                 print(f"[+] Retrieved {config_file} content:")
                 print(response.text)
@@ -81,7 +81,7 @@ def fetch_appsettings(appsettings, base_url, output_dir):
         except requests.exceptions.RequestException as e:
             print(f"[+] An error occurred while fetching {config_file}: {e}")
 
-def fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_all, common_wasm_assemblies, common_dll_assemblies):
+def fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_all, common_wasm_assemblies, common_dll_assemblies, headers):
     os.makedirs(output_dir, exist_ok=True)
     failed_resources = []
 
@@ -97,7 +97,7 @@ def fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_al
 
                 resource_url = f"{base_url.rstrip('/')}/_framework/{resource_file}"
                 try:
-                    response = requests.get(resource_url, verify=False)
+                    response = requests.get(resource_url, headers=headers, verify=False)
                     if response.status_code == 200:
                         output_path = os.path.join(output_dir, os.path.basename(resource_file))
                         with open(output_path, 'wb') as f:
@@ -118,5 +118,6 @@ def fetch_all_resources(resources, base_url, output_dir, dump_ms_system, dump_al
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check if a specific endpoint exists, determine the deployment method, and fetch appsettings references.")
     parser.add_argument("url", type=str, help="The base URL to check the endpoint.")
+    parser.add_argument("--headers", type=json.loads, default={}, help="Optional custom headers for the requests in JSON format.")
     args = parser.parse_args()
-    check_endpoint(args.url)
+    check_endpoint(args.url, args.headers)
