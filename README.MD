@@ -1,4 +1,4 @@
-# Tools Suite to Dump Blazor Applications
+# Tools Suite to Dump Microsoft .NET Blazor Applications
 
 
 <p align="center">
