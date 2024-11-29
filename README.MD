@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="/img/blazorrazor.png" width="200">
+  <img src="/img/blazorrazor-.png" width="300">
 </p>
 
 
